@@ -1,6 +1,7 @@
 # <img src="example.jpg" alt="Bongo Cat Typing" width="50" height="50" style="vertical-align: middle;"> bongo-cat-typing-app
 
-A movable floating bongo-cat that types while you type.
+A movable floating bongo-cat that types while you type. 
+Right click on bongo cat to show the close button.
 
 ## Prerequisites
 To set up the environment, run the following commands:
