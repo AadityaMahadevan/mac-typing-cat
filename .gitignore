@@ -1,0 +1,6 @@
+# Ignore venv
+cattyping/
+*.pyc
+__pycache__/
+.env
+*.DS_Store
