@@ -7,10 +7,9 @@ Author: Meiru Zhang
 Date: 2024-07-04
 """
 
-
 import sys
 import warnings
-from PyQt5.QtWidgets import QApplication, QWidget, QLabel, QPushButton, QVBoxLayout
+from PyQt5.QtWidgets import QApplication, QWidget,QDesktopWidget, QLabel, QPushButton, QVBoxLayout
 from PyQt5.QtCore import Qt, QTimer, QPoint
 from PyQt5.QtGui import QPixmap, QMouseEvent
 from ApplicationServices import *
@@ -27,6 +26,8 @@ class CatTypingWindow(QWidget):
         self.setupEventTap()
         self.dragging = False
         self.offset = QPoint()
+        self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
+
 
 
     def initUI(self):
@@ -44,6 +45,7 @@ class CatTypingWindow(QWidget):
         self.label.setStyleSheet("background-color: rgba(255, 255, 255, 0);")  # Fully transparent
         layout.addWidget(self.label)
 
+        self.close_button_isEnabled = False
         self.close_button = QPushButton("×", self)
         self.close_button.setStyleSheet("""
             QPushButton {
@@ -61,6 +63,9 @@ class CatTypingWindow(QWidget):
         self.close_button.setFixedSize(15, 15)
         self.close_button.clicked.connect(self.close_application)
         self.close_button.move(80, 5)  # Position in top-right corner
+        self.close_button.setEnabled(self.close_button_isEnabled)
+        self.close_button.hide()
+
 
         self.images = [
             [QPixmap(f"res/{i}{j}.gif").scaled(100, 100, Qt.KeepAspectRatio, Qt.SmoothTransformation) 
@@ -69,7 +74,22 @@ class CatTypingWindow(QWidget):
         ]
 
         self.updateImage()
+        
+        # self.setStyleSheet("border: 1px solid red;")
+
         self.show()
+
+        QTimer.singleShot(0, self.moveToBottomLeft)
+
+    def moveToBottomLeft(self):
+        screen = QApplication.primaryScreen()
+        screen_geometry = screen.availableGeometry()
+
+        bottom_left = screen_geometry.bottomLeft()
+        x = bottom_left.x()
+        y = bottom_left.y() - self.height() +60
+
+        self.move(x, y)
 
 
 
@@ -82,6 +102,14 @@ class CatTypingWindow(QWidget):
         if event.button() == Qt.LeftButton:
             self.dragging = True
             self.offset = event.pos()
+        if event.button() == Qt.RightButton:
+            if self.close_button_isEnabled:
+                self.close_button.hide()
+            else:
+                self.close_button.show()
+            self.close_button_isEnabled = not self.close_button_isEnabled
+            self.close_button.setEnabled(self.close_button_isEnabled)
+    
 
     def mouseMoveEvent(self, event: QMouseEvent):
         if self.dragging:
